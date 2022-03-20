@@ -6,8 +6,8 @@
 int main() {
     std::unique_ptr<Window> window;
     try {
-        window = std::make_unique<Window>(300, 300, "Hello, w1!");
-        window->Open();
+        window = std::make_unique<Window>(640, 480, "Hello, w1!");
+        window->OpenFullscreen();
     } catch (std::exception const &e) {
         std::cerr << e.what() << '\n';
         exit(-1);

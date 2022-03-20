@@ -18,9 +18,10 @@ void Window::TryTerminateGLFW() {
     }
 }
 
-void Window::Open() {
-    constexpr GLFWmonitor *fullscreenModeMonitor = nullptr;
-    constexpr GLFWwindow *sharingWindow = nullptr;
+void Window::TryCreateWindow(GLFWmonitor *fullscreenModeMonitor, GLFWwindow *sharingWindow) {
+    if (mIsOpened) {
+        throw std::runtime_error("Window is already opened");
+    }
 
     mHandle = glfwCreateWindow(mWidth, mHeight, mTitle.c_str(), fullscreenModeMonitor, sharingWindow);
 
@@ -30,10 +31,20 @@ void Window::Open() {
     }
 
     ++windowsCount;
+    mIsOpened = true;
+}
+
+void Window::Open() {
+    TryCreateWindow(nullptr, nullptr);
+}
+
+void Window::OpenFullscreen() {
+    TryCreateWindow(glfwGetPrimaryMonitor(), nullptr);
 }
 
 void Window::Close() noexcept {
     glfwDestroyWindow(mHandle);
+    mIsOpened = false;
 }
 
 void Window::PollEvents() {

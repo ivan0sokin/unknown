@@ -14,16 +14,20 @@ public:
     ~Window() noexcept;
 
     void Open();
+    void OpenFullscreen();
     void Close() noexcept;
-
     void PollEvents();
+
     bool ShouldBeClosed();
+    constexpr bool IsOpened() const { return mIsOpened; }
 private:
     void TryInitializeGLFW();
     void TryTerminateGLFW();
+    void TryCreateWindow(GLFWmonitor *fullscreenModeMonitor, GLFWwindow *sharingWindow);
 private:
     int mWidth, mHeight;
     std::string mTitle;
+    bool mIsOpened = false;
     GLFWwindow *mHandle;
 };
 
