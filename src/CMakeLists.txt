@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 3.3)
 project(unknown)
 
-
-add_definitions(-DGLFW_STATIC)
+add_definitions(-DGLFW_INCLUDE_NONE)
 
 set(GLFW_DIR D:/coding/third_party_libraries/glfw)
 set(VULKAN_DIR D:/coding/third_party_libraries/vulkan)
 set(SOURCES main.cpp
-            output/Window.cpp)
+            output/Window.cpp
+            output/renderer/Renderer.cpp
+            output/renderer/vulkan/VulkanContext.cpp)
 
 find_library(GLFW NAMES glfw3 PATHS ${GLFW_DIR}/*)
 find_library(VULKAN NAMES vulkan-1 PATHS ${VULKAN_DIR}/*)
