@@ -1,26 +1,30 @@
 #include <iostream>
-#include <memory>
 
 #include "output/Window.h"
 #include "output/renderer/Renderer.h"
 
 int main() {
-    std::unique_ptr<Window> window;
+    auto window = Window(640, 480, "Hello, w1!");
     try {
-        window = std::make_unique<Window>(640, 480, "Hello, w1!");
-        window->Open();
+        window.Open();
     } catch (std::exception const &e) {
         std::cerr << e.what() << '\n';
         exit(-1);
     }
 
     auto vulkanRenderer = Renderer(GraphicsAPI::Vulkan);
-
-    while (!window->ShouldBeClosed()) {
-        window->PollEvents();
+    try {
+        vulkanRenderer.Initialize();
+    } catch (std::exception const &e) {
+        std::cerr << e.what() << '\n';
+        exit(-1);
     }
 
-    window->Close();
+    while (!window.ShouldBeClosed()) {
+        window.PollEvents();
+    }
+
+    window.Close();
 
     return 0;
 }

@@ -10,7 +10,7 @@
 class Window {
 public:
     Window() = default;
-    Window(int width, int height, std::string_view title);
+    Window(int width, int height, std::string_view title) noexcept;
     ~Window() noexcept;
 
     void Open();
@@ -23,6 +23,7 @@ public:
 private:
     void TryInitializeGLFW();
     void TryTerminateGLFW();
+    void SetSpecificWindowHints() noexcept;
     void TryCreateWindow(GLFWmonitor *fullscreenModeMonitor, GLFWwindow *sharingWindow);
 private:
     int mWidth, mHeight;

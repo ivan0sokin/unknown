@@ -11,7 +11,7 @@ enum class GraphicsAPI {
 
 class Renderer {
 public:
-    Renderer(GraphicsAPI const &API);
+    Renderer(GraphicsAPI const &API) noexcept;
     void Initialize();
 private:
     std::unique_ptr<GraphicsContext> mContext;

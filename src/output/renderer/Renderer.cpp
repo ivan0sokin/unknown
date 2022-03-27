@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "vulkan/VulkanContext.h"
 
-Renderer::Renderer(GraphicsAPI const &API) {
+Renderer::Renderer(GraphicsAPI const &API) noexcept {
     mContext = std::make_unique<VulkanContext>();
 }
 
