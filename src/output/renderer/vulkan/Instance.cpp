@@ -40,7 +40,7 @@ void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {
         .ppEnabledExtensionNames = mEnabledExtensionNames.data()
     };
 
-    VkResult res = vkCreateInstance(&createInfo, nullptr, &mInstance);
+    VkResult res = vkCreateInstance(&createInfo, nullptr, &mHandle);
     if (res != VK_SUCCESS) {
         throw std::runtime_error("Failed to create VkInstance, error code: " + std::to_string(res));
     }
@@ -63,5 +63,5 @@ bool Instance::CheckEnabledExtensionsSupported() noexcept {
 }
 
 Instance::~Instance() noexcept {
-    vkDestroyInstance(mInstance, nullptr);
+    vkDestroyInstance(mHandle, nullptr);
 }

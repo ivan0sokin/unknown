@@ -6,7 +6,7 @@ ApplicationInfo::ApplicationInfo(std::string_view applicationName, unsigned appl
         engineVersion) {}
 
 void ApplicationInfo::Initialize() noexcept {
-    mApplicationInfo = VkApplicationInfo {
+    mDescriptor = VkApplicationInfo {
         .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
         .pApplicationName = mApplicationName.c_str(),
         .applicationVersion = mApplicationVersion,

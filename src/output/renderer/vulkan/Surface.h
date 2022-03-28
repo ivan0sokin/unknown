@@ -10,11 +10,7 @@ public:
 
     static char const * GetExtensionName() noexcept;
     static char const * GetPlatformSpecificExtensionName() noexcept;
-
-    constexpr VkSurfaceKHR GetHandle() const noexcept override { return mSurface; }
 private:
-    VkSurfaceKHR mSurface;
-
     constexpr static char const *extensionName = "VK_KHR_surface",
     *windowsExtensionName = "VK_KHR_win32_surface",
     *linuxExtensionName = "VK_KHR_xlib_surface",

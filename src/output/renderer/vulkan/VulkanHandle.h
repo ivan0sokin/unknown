@@ -8,7 +8,9 @@ class VulkanHandle {
 public:
     VulkanHandle() = default;
     virtual ~VulkanHandle() = default;
-    constexpr virtual T GetHandle() const noexcept = 0;
+    constexpr virtual T GetHandle() const noexcept { return mHandle; }
+protected:
+    T mHandle;
 };
 
 #endif

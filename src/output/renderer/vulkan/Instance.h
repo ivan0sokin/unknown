@@ -15,8 +15,6 @@ public:
 
     inline std::vector<VkLayerProperties> GetLayerProperties() noexcept { return mLayerProperties; }
     inline std::vector<VkExtensionProperties> GetExtensionProperties() noexcept { return mExtensionProperties; }
-
-    constexpr VkInstance GetHandle() const noexcept override { return mInstance; }
 private:
     void InitializeLayerProperties() noexcept;
     void InitializeExtensionProperties() noexcept;
@@ -26,7 +24,6 @@ private:
     std::vector<VkLayerProperties> mLayerProperties;
     std::vector<VkExtensionProperties> mExtensionProperties;
     std::vector<char const *> mEnabledLayerNames, mEnabledExtensionNames;
-    VkInstance mInstance;
 };
 
 #endif

@@ -8,7 +8,9 @@ class VulkanDescriptor {
 public:
     VulkanDescriptor() = default;
     virtual ~VulkanDescriptor() = default;
-    constexpr virtual T GetDescriptor() const noexcept = 0;
+    constexpr virtual T GetDescriptor() const noexcept { return mDescriptor; }
+protected:
+    T mDescriptor;
 };
 
 #endif
