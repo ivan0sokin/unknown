@@ -62,5 +62,6 @@ bool Window::ShouldBeClosed() {
 }
 
 void Window::SetSpecificWindowHints() noexcept {
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 }
