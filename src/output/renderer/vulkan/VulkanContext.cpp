@@ -1,14 +1,20 @@
 #include "VulkanContext.h"
 
-VulkanContext::VulkanContext() noexcept {
+void VulkanContext::Initialize() {
+    mAppInfo.Initialize();
+
     auto requiredLayerNames = GetRequiredInstanceLayerNames();
     auto requiredExtensionNames = GetRequiredInstanceExtensionNames();
     mInstance = std::make_unique<Instance>(requiredLayerNames, requiredExtensionNames);
-}
-
-void VulkanContext::Initialize() {
-    mAppInfo.Initialize();
     mInstance->TryCreate(mAppInfo.GetDescriptor());
+
+    if (Core::Build::configuration == Core::Build::Configuration::Debug) {
+        mDebugger = std::make_unique<Debugger>(mInstance->GetHandle(), [&](MessageSeverity const &messageSeverity, MessageType const &messageType, std::string_view message) {
+            auto &outputStream = (messageSeverity >= MessageSeverity::Warning ? std::cerr : std::cout);
+            outputStream << message << std::endl;
+        });
+        mDebugger->TryCreate();
+    }
 }
 
 std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() noexcept {
@@ -30,4 +36,12 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() noe
     }
 
     return requiredExtensions;
+}
+
+VulkanContext::~VulkanContext() noexcept {
+    if (Core::Build::configuration == Core::Build::Configuration::Debug) {
+        mDebugger->Destroy();
+    }
+
+    mInstance->Destroy();
 }

@@ -12,6 +12,7 @@ public:
     ~Instance() noexcept override;
 
     void TryCreate(VkApplicationInfo const &applicationInfo);
+    void Destroy() noexcept;
 
     inline std::vector<VkLayerProperties> GetLayerProperties() noexcept { return mLayerProperties; }
     inline std::vector<VkExtensionProperties> GetExtensionProperties() noexcept { return mExtensionProperties; }

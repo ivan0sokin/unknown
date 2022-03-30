@@ -1,7 +1,7 @@
 #ifndef UNKNOWN_VULKANDESCRIPTOR_H
 #define UNKNOWN_VULKANDESCRIPTOR_H
 
-#include <vulkan/vulkan.hpp>
+#include "VulkanDefinitions.h"
 
 template <typename T>
 class VulkanDescriptor {

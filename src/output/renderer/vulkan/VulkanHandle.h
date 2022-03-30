@@ -1,7 +1,7 @@
 #ifndef UNKNOWN_VULKANHANDLE_H
 #define UNKNOWN_VULKANHANDLE_H
 
-#include <vulkan/vulkan.hpp>
+#include "VulkanDefinitions.h"
 
 template <typename T>
 class VulkanHandle {
