@@ -40,9 +40,9 @@ void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {
         .ppEnabledExtensionNames = mEnabledExtensionNames.data()
     };
 
-    VkResult res = vkCreateInstance(&createInfo, nullAllocator, &mHandle);
-    if (res != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create VkInstance, error code: " + std::to_string(res));
+    VulkanResult result = vkCreateInstance(&createInfo, nullAllocator, &mHandle);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to create VkInstance, result: " + result.ToString());
     }
 }
 

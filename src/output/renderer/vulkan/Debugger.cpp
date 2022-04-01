@@ -12,9 +12,9 @@ void Debugger::TryCreate() {
         .pUserData = reinterpret_cast<void*>(this)
     };
 
-    VkResult res = CreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullAllocator, &mHandle);
-    if (res != VK_SUCCESS) {
-        throw std::runtime_error("Failed to create VkDebugUtilsMessengerEXT, error code: " + std::to_string(res));
+    VulkanResult result = CreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullAllocator, &mHandle);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to create VkDebugUtilsMessengerEXT, result: " + result.ToString());
     }
 }
 

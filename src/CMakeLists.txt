@@ -9,6 +9,7 @@ set(SOURCES main.cpp
             output/Window.cpp
             output/renderer/Renderer.cpp
             output/renderer/vulkan/VulkanContext.cpp
+            output/renderer/vulkan/VulkanResult.cpp
             output/renderer/vulkan/Instance.cpp
             output/renderer/vulkan/ApplicationInfo.cpp
             output/renderer/vulkan/Surface.cpp

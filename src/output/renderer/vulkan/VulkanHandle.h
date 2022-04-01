@@ -2,6 +2,7 @@
 #define UNKNOWN_VULKANHANDLE_H
 
 #include "VulkanDefinitions.h"
+#include "VulkanResult.h"
 
 template <typename T>
 class VulkanHandle {
