@@ -12,18 +12,30 @@ Instance::Instance(std::span<const char *> enabledLayerNames, std::span<const ch
 
 void Instance::InitializeLayerProperties() noexcept {
     unsigned propertyCount;
-    vkEnumerateInstanceLayerProperties(&propertyCount, nullptr);
+    VulkanResult result = vkEnumerateInstanceLayerProperties(&propertyCount, nullptr);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkLayerProperties count, result: " + result.ToString());
+    }
 
     mLayerProperties.resize(static_cast<std::size_t>(propertyCount));
-    vkEnumerateInstanceLayerProperties(&propertyCount, mLayerProperties.data());
+    result = vkEnumerateInstanceLayerProperties(&propertyCount, mLayerProperties.data());
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkLayerProperties, result: " + result.ToString());
+    }
 }
 
 void Instance::InitializeExtensionProperties() noexcept {
     unsigned propertyCount;
-    vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
+    VulkanResult result = vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkExtensionProperties count, result: " + result.ToString());
+    }
 
     mExtensionProperties.resize(static_cast<std::size_t>(propertyCount));
-    vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, mExtensionProperties.data());
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, mExtensionProperties.data());
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkExtensionProperties, result: " + result.ToString());
+    }
 }
 
 void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {

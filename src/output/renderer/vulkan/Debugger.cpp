@@ -1,15 +1,16 @@
 #include "Debugger.h"
 
-Debugger::Debugger(VkInstance instance, DebuggerCallback callback) noexcept :
-        mInstance(instance), mCallback(std::move(callback)) {}
+Debugger::Debugger(VkInstance instance, MessageSeverity callbackMessageSeverity, MessageType callbackMessageType, DebuggerCallback callback) noexcept :
+        mInstance(instance), mCallbackMessageSeverity(callbackMessageSeverity),
+        mCallbackMessageType(callbackMessageType), mCallback(std::move(callback)) {}
 
 void Debugger::TryCreate() {
-    VkDebugUtilsMessengerCreateInfoEXT createInfo {
+    VkDebugUtilsMessengerCreateInfoEXT createInfo = {
         .sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
-        .messageSeverity = lowMessageSeverity,
-        .messageType = allTypesOfMessages,
+        .messageSeverity = static_cast<VkDebugUtilsMessageSeverityFlagsEXT>(mCallbackMessageSeverity),
+        .messageType = static_cast<VkDebugUtilsMessageTypeFlagsEXT>(mCallbackMessageType),
         .pfnUserCallback = CallbackHandler,
-        .pUserData = reinterpret_cast<void*>(this)
+        .pUserData = reinterpret_cast<void *>(this)
     };
 
     VulkanResult result = CreateDebugUtilsMessengerEXT(mInstance, &createInfo, nullAllocator, &mHandle);
@@ -20,10 +21,12 @@ void Debugger::TryCreate() {
 
 VkBool32 Debugger::CallbackHandler(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
                                    VkDebugUtilsMessageTypeFlagsEXT messageType,
-                                   const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, void *pUserData) {
+                                   const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData,
+                                   void *pUserData) {
 
-    reinterpret_cast<Debugger*>(pUserData)->mCallback(static_cast<MessageSeverity>(messageSeverity),
-                                                      static_cast<MessageType>(messageType), pCallbackData->pMessage);
+    reinterpret_cast<Debugger *>(pUserData)->mCallback(static_cast<MessageSeverity>(messageSeverity),
+                                                       static_cast<MessageType>(messageType),
+                                                       pCallbackData->pMessage);
 
     return VK_FALSE;
 }

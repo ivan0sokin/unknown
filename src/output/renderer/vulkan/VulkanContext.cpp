@@ -9,12 +9,15 @@ void VulkanContext::Initialize() {
     mInstance->TryCreate(mAppInfo.GetDescriptor());
 
     if (Core::Build::configuration == Core::Build::Configuration::Debug) {
-        mDebugger = std::make_unique<Debugger>(mInstance->GetHandle(), [&](MessageSeverity const &messageSeverity, MessageType const &messageType, std::string_view message) {
-            auto &outputStream = (messageSeverity >= MessageSeverity::Warning ? std::cerr : std::cout);
+        mDebugger = std::make_unique<Debugger>(mInstance->GetHandle(), preferredCallbackMessageSeverity, preferredCallbackMessageType, [&](MessageSeverity const &messageSeverity, MessageType const &messageType, std::string_view message) {
+            auto &outputStream = (messageSeverity >= MessageSeverity::Major ? std::cerr : std::cout);
             outputStream << message << std::endl;
         });
         mDebugger->TryCreate();
     }
+
+    mPhysicalDeviceHandleList = std::make_unique<PhysicalDeviceHandleList>(mInstance->GetHandle());
+    mPhysicalDeviceHandleList->TryInitialize();
 }
 
 std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() noexcept {

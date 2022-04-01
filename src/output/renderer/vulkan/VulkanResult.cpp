@@ -41,7 +41,7 @@ std::unordered_map<int, std::string> VulkanResult::resultCodeNames = {
     { VK_OPERATION_NOT_DEFERRED_KHR,                         "Operation { not deferred }" }
 };
 
-std::string VulkanResult::ToString() {
+std::string VulkanResult::ToString() const {
     int resultCode = static_cast<int>(mResult);
     if (!resultCodeNames.contains(resultCode)) {
         throw std::runtime_error("Invalid result code: " + std::to_string(resultCode));
