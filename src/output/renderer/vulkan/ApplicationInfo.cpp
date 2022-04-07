@@ -1,9 +1,13 @@
 #include "ApplicationInfo.h"
 
-ApplicationInfo::ApplicationInfo(std::string_view applicationName, unsigned applicationVersion,
-                                 std::string_view engineName, unsigned engineVersion) noexcept : mApplicationName(
-        applicationName), mApplicationVersion(applicationVersion), mEngineName(engineName), mEngineVersion(
-        engineVersion) {}
+ApplicationInfo::ApplicationInfo(std::string_view applicationName, VulkanVersion const &applicationVersion,
+                                 std::string_view engineName, VulkanVersion const &engineVersion,
+                                 VulkanVersion const &APIVersion) noexcept : mApplicationName(applicationName),
+                                                                             mApplicationVersion(applicationVersion),
+                                                                             mEngineName(engineName),
+                                                                             mEngineVersion(engineVersion),
+                                                                             mAPIVersion(APIVersion) {}
+
 
 void ApplicationInfo::Initialize() noexcept {
     mDescriptor = VkApplicationInfo {
@@ -12,6 +16,6 @@ void ApplicationInfo::Initialize() noexcept {
         .applicationVersion = mApplicationVersion,
         .pEngineName = mEngineName.c_str(),
         .engineVersion = mEngineVersion,
-        .apiVersion = apiVersion
+        .apiVersion = mAPIVersion
     };
 }

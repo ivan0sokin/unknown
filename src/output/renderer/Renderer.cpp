@@ -1,10 +1,10 @@
 #include "Renderer.h"
-#include "vulkan/VulkanContext.h"
 
 Renderer::Renderer(GraphicsAPI const &API) noexcept {
-    mContext = std::make_unique<VulkanContext>();
+    mGraphicsAPI = API;
 }
 
-void Renderer::Initialize() {
+void Renderer::Initialize(WindowProperties const &windowProperties) {
+    mContext = std::make_unique<VulkanContext>(windowProperties);
     mContext->Initialize();
 }

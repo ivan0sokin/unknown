@@ -7,6 +7,8 @@
 #define DEBUG_STATE 1
 #endif
 
+#include "Version.h"
+
 namespace Core {
     namespace Build {
         enum class Configuration {
@@ -14,7 +16,17 @@ namespace Core {
             Release
         };
 
-        constexpr Configuration configuration = static_cast<Configuration>(DEBUG_STATE);
+        constexpr Configuration CONFIGURATION = static_cast<Configuration>(DEBUG_STATE);
+    }
+
+    namespace Engine {
+        constexpr std::string_view NAME = "Raycast";
+        constexpr Version VERSION = Version(0, 0, 1);
+    }
+
+    namespace Application {
+        constexpr std::string_view NAME = "Unknown";
+        constexpr Version VERSION = Version(0, 0, 1);
     }
 }
 

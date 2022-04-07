@@ -1,6 +1,6 @@
 #include "Instance.h"
 
-Instance::Instance() noexcept {
+Instance::Instance() {
     InitializeLayerProperties();
     InitializeExtensionProperties();
 }
@@ -10,7 +10,7 @@ Instance::Instance(std::span<const char *> enabledLayerNames, std::span<const ch
     mEnabledExtensionNames.assign(enabledExtensionNames.begin(), enabledExtensionNames.end());
 }
 
-void Instance::InitializeLayerProperties() noexcept {
+void Instance::InitializeLayerProperties() {
     unsigned propertyCount;
     VulkanResult result = vkEnumerateInstanceLayerProperties(&propertyCount, nullptr);
     if (!result.Success()) {
@@ -24,7 +24,7 @@ void Instance::InitializeLayerProperties() noexcept {
     }
 }
 
-void Instance::InitializeExtensionProperties() noexcept {
+void Instance::InitializeExtensionProperties() {
     unsigned propertyCount;
     VulkanResult result = vkEnumerateInstanceExtensionProperties(nullptr, &propertyCount, nullptr);
     if (!result.Success()) {
@@ -39,8 +39,12 @@ void Instance::InitializeExtensionProperties() noexcept {
 }
 
 void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {
-    if (!CheckEnabledLayersSupported() || !CheckEnabledExtensionsSupported()) {
+    if (!AreEnabledLayersSupported() || !AreEnabledExtensionsSupported()) {
         throw std::runtime_error("Some of enabled layers or extensions are not supported");
+    }
+
+    if (!IsRequiredAPIVersionSupported()) {
+        throw std::runtime_error("Outdated Vulkan API version");
     }
 
     VkInstanceCreateInfo createInfo = {
@@ -58,7 +62,17 @@ void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {
     }
 }
 
-bool Instance::CheckEnabledLayersSupported() noexcept {
+bool Instance::IsRequiredAPIVersionSupported() const {
+    unsigned supportedAPIVersion;
+    VulkanResult result = vkEnumerateInstanceVersion(&supportedAPIVersion);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to enumerate instance version, result: " + result.ToString());
+    }
+
+    return supportedAPIVersion >= minimumRequiredAPIVersion.ToNumber();
+}
+
+bool Instance::AreEnabledLayersSupported() const noexcept {
     return std::ranges::all_of(mEnabledLayerNames, [&](auto enabledLayerName) {
         return std::ranges::find_if(std::as_const(mLayerProperties), [&](auto const &layerProperty) {
             return std::string_view(layerProperty.layerName) == std::string_view(enabledLayerName);
@@ -66,7 +80,7 @@ bool Instance::CheckEnabledLayersSupported() noexcept {
     });
 }
 
-bool Instance::CheckEnabledExtensionsSupported() noexcept {
+bool Instance::AreEnabledExtensionsSupported() const noexcept {
     return std::ranges::all_of(mEnabledExtensionNames, [&](auto enabledExtensionName) {
         return std::ranges::find_if(std::as_const(mExtensionProperties), [&](auto const &extensionProperty) {
             return std::string_view(extensionProperty.extensionName) == std::string_view(enabledExtensionName);

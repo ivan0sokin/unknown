@@ -1,9 +1,10 @@
 #ifndef UNKNOWN_RENDERER_H
 #define UNKNOWN_RENDERER_H
 
-#include <memory>
+#include "../window/WindowProperties.h"
+#include "vulkan/VulkanContext.h"
 
-#include "GraphicsContext.h"
+#include <memory>
 
 enum class GraphicsAPI {
     Vulkan = 0
@@ -11,10 +12,12 @@ enum class GraphicsAPI {
 
 class Renderer {
 public:
+    Renderer() = default;
     Renderer(GraphicsAPI const &API) noexcept;
-    void Initialize();
+    void Initialize(WindowProperties const &windowProperties);
 private:
-    std::unique_ptr<GraphicsContext> mContext;
+    GraphicsAPI mGraphicsAPI;
+    std::unique_ptr<VulkanContext> mContext;
 };
 
 #endif

@@ -6,6 +6,9 @@
 #include <stdexcept>
 
 #include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
+#include "WindowProperties.h"
 
 class Window {
 public:
@@ -17,6 +20,8 @@ public:
     void OpenFullscreen();
     void Close() noexcept;
     void PollEvents();
+
+    WindowProperties GetProperties() noexcept;
 
     bool ShouldBeClosed();
     constexpr bool IsOpened() const { return mIsOpened; }

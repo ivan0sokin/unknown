@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "output/Window.h"
+#include "output/window/Window.h"
 #include "output/renderer/Renderer.h"
 
 int main() {
@@ -14,7 +14,7 @@ int main() {
 
     auto vulkanRenderer = Renderer(GraphicsAPI::Vulkan);
     try {
-        vulkanRenderer.Initialize();
+        vulkanRenderer.Initialize(window.GetProperties());
     } catch (std::exception const &e) {
         std::cerr << e.what() << '\n';
         exit(-1);

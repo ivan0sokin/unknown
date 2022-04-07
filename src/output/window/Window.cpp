@@ -65,3 +65,7 @@ void Window::SetSpecificWindowHints() noexcept {
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 }
+
+WindowProperties Window::GetProperties() noexcept {
+    return WindowProperties { glfwGetWin32Window(mHandle) };
+}
