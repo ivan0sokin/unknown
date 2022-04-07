@@ -1,6 +1,6 @@
 #include "QueueFamilyIndices.h"
 
-void QueueFamilyIndices::Initialize() {
+void QueueFamilyIndices::TryInitialize() {
     auto queueFamilyPropertiesList = GetQueueFamilyPropertiesList();
     unsigned queueFamilyIndex = 0;
     std::ranges::find_if(queueFamilyPropertiesList | std::views::transform([](auto const &properties) { return properties.queueFlags; }), [&](auto queueFlags) {
@@ -35,4 +35,12 @@ bool QueueFamilyIndices::QueueFamilyIndexIsSupportedBySurface(unsigned queueFami
     }
 
     return isQueueFamilySupportedBySurface == VK_TRUE;
+}
+
+bool QueueFamilyIndices::AreGraphicsAndPresentFamilyIndicesSimilar() const {
+    if (!mGraphicsQueueFamilyIndex || !mPresentQueueFamilyIndex) {
+        throw std::runtime_error("Graphics or Present queue family was not found");
+    }
+
+    return mGraphicsQueueFamilyIndex == mPresentQueueFamilyIndex;
 }

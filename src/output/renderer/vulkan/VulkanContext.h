@@ -13,19 +13,21 @@
 #include "PhysicalDevice.h"
 #include "Surface.h"
 #include "QueueFamilyIndices.h"
+#include "QueueCreateInfo.h"
+#include "LogicalDevice.h"
 
 class VulkanContext : public GraphicsContext {
 public:
-    VulkanContext() = default;
+    VulkanContext() = delete;
     inline VulkanContext(WindowProperties const &windowProperties) noexcept : mWindowProperties(windowProperties) {}
     ~VulkanContext() noexcept override;
 
     void Initialize() override;
 private:
-    std::vector<char const *> GetRequiredInstanceLayerNames() noexcept;
-    std::vector<char const *> GetRequiredInstanceExtensionNames() noexcept;
+    std::vector<char const *> GetRequiredInstanceLayerNames() const noexcept;
+    std::vector<char const *> GetRequiredInstanceExtensionNames() const noexcept;
 
-    void PickPrimaryPhysicalDevice();
+    void TryPickPrimaryPhysicalDevice();
 private:
     WindowProperties mWindowProperties;
 
@@ -34,6 +36,7 @@ private:
     std::unique_ptr<Surface> mSurface;
     std::vector<PhysicalDevice> mPhysicalDevices;
     std::unique_ptr<PhysicalDevice> mPrimaryPhysicalDevice;
+    std::unique_ptr<LogicalDevice> mLogicalDevice;
 
     constexpr static std::array<char const *, 1> debugLayers = { "VK_LAYER_KHRONOS_validation" };
     constexpr static std::array<char const *, 1> debugExtensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };

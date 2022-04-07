@@ -8,11 +8,12 @@
 
 class Instance : public VulkanHandle<VkInstance> {
 public:
-    Instance();
-    Instance(std::span<char const *> enabledLayerNames, std::span<char const *> enabledExtensionNames) noexcept;
+    Instance() = delete;
+    Instance(std::span<char const *> enabledLayerNames, std::span<char const *> enabledExtensionNames, VkApplicationInfo const &applicationInfo) noexcept;
     ~Instance() noexcept override;
 
-    void TryCreate(VkApplicationInfo const &applicationInfo);
+    void TryInitialize();
+    void TryCreate();
     void Destroy() noexcept;
 
     inline std::vector<VkLayerProperties> GetLayerProperties() const noexcept { return mLayerProperties; }
@@ -26,11 +27,12 @@ private:
     bool AreEnabledLayersSupported() const noexcept;
     bool AreEnabledExtensionsSupported() const noexcept;
 private:
+    VkApplicationInfo mApplicationInfo;
+    std::vector<char const *> mEnabledLayerNames, mEnabledExtensionNames;
     std::vector<VkLayerProperties> mLayerProperties;
     std::vector<VkExtensionProperties> mExtensionProperties;
-    std::vector<char const *> mEnabledLayerNames, mEnabledExtensionNames;
 
-    constexpr static VulkanVersion minimumRequiredAPIVersion = VK_API_VERSION_1_3;
+    constexpr static VulkanVersion minimumRequiredAPIVersion = VK_API_VERSION_1_2;
 };
 
 #endif

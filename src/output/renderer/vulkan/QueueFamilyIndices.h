@@ -8,13 +8,14 @@
 
 class QueueFamilyIndices {
 public:
-    QueueFamilyIndices() = default;
+    QueueFamilyIndices() = delete;
     constexpr QueueFamilyIndices(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface) noexcept : mPhysicalDevice(physicalDevice), mSurface(surface) {}
 
-    void Initialize();
+    void TryInitialize();
 
     constexpr std::optional<unsigned> TryGetGraphicsQueueFamilyIndex() const noexcept { return mGraphicsQueueFamilyIndex; }
     constexpr std::optional<unsigned> TryGetPresentQueueFamilyIndex() const noexcept { return mPresentQueueFamilyIndex; }
+    bool AreGraphicsAndPresentFamilyIndicesSimilar() const;
 private:
     bool QueueFamilyIndexIsSupportedBySurface(unsigned queueFamilyIndex);
     std::vector<VkQueueFamilyProperties> GetQueueFamilyPropertiesList() noexcept;

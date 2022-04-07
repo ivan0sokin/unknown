@@ -7,7 +7,7 @@
 
 class PhysicalDevice : public VulkanHandle<VkPhysicalDevice> {
 public:
-    PhysicalDevice() = default;
+    PhysicalDevice() = delete;
     static std::vector<PhysicalDevice> GetPhysicalDeviceList(VkInstance instance);
 private:
     constexpr PhysicalDevice(VkPhysicalDevice physicalDevice) noexcept { mHandle = physicalDevice; }

@@ -15,7 +15,7 @@
 
 class Surface : public VulkanHandle<VkSurfaceKHR> {
 public:
-    Surface() = default;
+    Surface() = delete;
     constexpr Surface(VkInstance instance, HWND windowHandle) noexcept : mInstance(instance), mWindowHandle(windowHandle) {}
     ~Surface() noexcept override;
 

@@ -1,13 +1,21 @@
 #include "Instance.h"
 
-Instance::Instance() {
-    InitializeLayerProperties();
-    InitializeExtensionProperties();
-}
-
-Instance::Instance(std::span<const char *> enabledLayerNames, std::span<const char *> enabledExtensionNames) noexcept : Instance() {
+Instance::Instance(std::span<const char *> enabledLayerNames, std::span<const char *> enabledExtensionNames, VkApplicationInfo const &applicationInfo) noexcept : mApplicationInfo(applicationInfo) {
     mEnabledLayerNames.assign(enabledLayerNames.begin(), enabledLayerNames.end());
     mEnabledExtensionNames.assign(enabledExtensionNames.begin(), enabledExtensionNames.end());
+}
+
+void Instance::TryInitialize() {
+    InitializeLayerProperties();
+    InitializeExtensionProperties();
+
+    if (!AreEnabledLayersSupported() || !AreEnabledExtensionsSupported()) {
+        throw std::runtime_error("Some of enabled layers or extensions are not supported");
+    }
+
+    if (!IsRequiredAPIVersionSupported()) {
+        throw std::runtime_error("Outdated Vulkan API version");
+    }
 }
 
 void Instance::InitializeLayerProperties() {
@@ -38,18 +46,10 @@ void Instance::InitializeExtensionProperties() {
     }
 }
 
-void Instance::TryCreate(VkApplicationInfo const &applicationInfo) {
-    if (!AreEnabledLayersSupported() || !AreEnabledExtensionsSupported()) {
-        throw std::runtime_error("Some of enabled layers or extensions are not supported");
-    }
-
-    if (!IsRequiredAPIVersionSupported()) {
-        throw std::runtime_error("Outdated Vulkan API version");
-    }
-
+void Instance::TryCreate() {
     VkInstanceCreateInfo createInfo = {
         .sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-        .pApplicationInfo = &applicationInfo,
+        .pApplicationInfo = &mApplicationInfo,
         .enabledLayerCount = static_cast<unsigned>(mEnabledLayerNames.size()),
         .ppEnabledLayerNames = mEnabledLayerNames.data(),
         .enabledExtensionCount = static_cast<unsigned>(mEnabledExtensionNames.size()),

@@ -7,13 +7,17 @@
 class ApplicationInfo : public VulkanDescriptor<VkApplicationInfo> {
 public:
     ApplicationInfo() = default;
-    ApplicationInfo(std::string_view applicationName, VulkanVersion const &applicationVersion, std::string_view engineName,
-                    VulkanVersion const &engineVersion, VulkanVersion const &APIVersion) noexcept;
-
-    void Initialize() noexcept;
-private:
-    std::string mApplicationName, mEngineName;
-    VulkanVersion mApplicationVersion, mEngineVersion, mAPIVersion;
+    constexpr ApplicationInfo(std::string_view applicationName, VulkanVersion const &applicationVersion, std::string_view engineName,
+                              VulkanVersion const &engineVersion, VulkanVersion const &APIVersion) noexcept {
+        mDescriptor = {
+            .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
+            .pApplicationName = applicationName.data(),
+            .applicationVersion = applicationVersion,
+            .pEngineName = engineName.data(),
+            .engineVersion = engineVersion,
+            .apiVersion = APIVersion
+        };
+    }
 };
 
 #endif

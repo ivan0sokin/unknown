@@ -8,13 +8,12 @@ void VulkanContext::Initialize() {
         Core::Engine::VERSION,
         Instance::GetMinimumRequiredAPIVersion()
     );
-    applicationInfo.Initialize();
 
     auto requiredLayerNames = GetRequiredInstanceLayerNames();
     auto requiredExtensionNames = GetRequiredInstanceExtensionNames();
-
-    mInstance = std::make_unique<Instance>(requiredLayerNames, requiredExtensionNames);
-    mInstance->TryCreate(applicationInfo.GetDescriptor());
+    mInstance = std::make_unique<Instance>(requiredLayerNames, requiredExtensionNames, applicationInfo.GetDescriptor());
+    mInstance->TryInitialize();
+    mInstance->TryCreate();
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
         mDebugger = std::make_unique<Debugger>(mInstance->GetHandle(), preferredCallbackMessageSeverity, preferredCallbackMessageType, [&](MessageSeverity const &messageSeverity, MessageType const &messageType, std::string_view message) {
@@ -28,22 +27,31 @@ void VulkanContext::Initialize() {
     mSurface->TryCreate();
 
     mPhysicalDevices = PhysicalDevice::GetPhysicalDeviceList(mInstance->GetHandle());
-    PickPrimaryPhysicalDevice();
+    TryPickPrimaryPhysicalDevice();
+
+    auto queueFamilyIndices = QueueFamilyIndices(mPrimaryPhysicalDevice->GetHandle(), mSurface->GetHandle());
+    queueFamilyIndices.TryInitialize();
+
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfoList = { QueueCreateInfo(queueFamilyIndices.TryGetGraphicsQueueFamilyIndex().value(), { HIGH_PRIORITY }).GetDescriptor() };
+    if (!queueFamilyIndices.AreGraphicsAndPresentFamilyIndicesSimilar()) {
+        queueCreateInfoList.push_back(QueueCreateInfo(queueFamilyIndices.TryGetPresentQueueFamilyIndex().value(), { HIGH_PRIORITY }).GetDescriptor());
+    }
+
+    mLogicalDevice = std::make_unique<LogicalDevice>(mPrimaryPhysicalDevice->GetHandle(), queueCreateInfoList);
+    mLogicalDevice->TryCreate();
 }
 
-std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() noexcept {
+std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() const noexcept {
     std::vector<char const *> requiredLayers;
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
         requiredLayers.insert(requiredLayers.cend(), debugLayers.cbegin(), debugLayers.cend());
     }
 
-    requiredLayers.push_back("VK_LAYER_VALVE_steam_overlay");
-
     return requiredLayers;
 }
 
-std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() noexcept {
+std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() const noexcept {
     std::vector<char const *> requiredExtensions;
     requiredExtensions.insert(requiredExtensions.cend(), { Surface::GetExtensionName(), Surface::GetPlatformSpecificExtensionName() });
 
@@ -54,10 +62,10 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() noe
     return requiredExtensions;
 }
 
-void VulkanContext::PickPrimaryPhysicalDevice() {
+void VulkanContext::TryPickPrimaryPhysicalDevice() {
     auto suitablePhysicalDevice = std::ranges::find_if(mPhysicalDevices, [&](auto &physicalDevice) {
         auto queueFamilyIndices = QueueFamilyIndices(physicalDevice.GetHandle(), mSurface->GetHandle());
-        queueFamilyIndices.Initialize();
+        queueFamilyIndices.TryInitialize();
         return queueFamilyIndices.TryGetGraphicsQueueFamilyIndex() && queueFamilyIndices.TryGetPresentQueueFamilyIndex();
     });
 
@@ -69,6 +77,8 @@ void VulkanContext::PickPrimaryPhysicalDevice() {
 }
 
 VulkanContext::~VulkanContext() noexcept {
+    mLogicalDevice->Destroy();
+
     mPrimaryPhysicalDevice.release();
 
     mSurface->Destroy();

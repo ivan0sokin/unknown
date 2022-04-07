@@ -24,7 +24,7 @@ using DebuggerCallback = std::function<void(MessageSeverity const &messageSeveri
 
 class Debugger : public VulkanHandle<VkDebugUtilsMessengerEXT> {
 public:
-    Debugger() = default;
+    Debugger() = delete;
     Debugger(VkInstance instance, MessageSeverity callbackMessageSeverity, MessageType callbackMessageType, DebuggerCallback callback) noexcept;
     ~Debugger() noexcept override;
 
