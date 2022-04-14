@@ -26,7 +26,7 @@ void VulkanContext::Initialize() {
     mSurface = std::make_unique<Surface>(mInstance->GetHandle(), mWindowProperties.windowHandle);
     mSurface->TryCreate();
 
-    mPhysicalDevices = PhysicalDevice::GetPhysicalDeviceList(mInstance->GetHandle());
+    mPhysicalDevices = mInstance->GetPhysicalDeviceList();
     TryPickPrimaryPhysicalDevice();
 
     auto queueFamilyIndices = QueueFamilyIndices(mPrimaryPhysicalDevice->GetHandle(), mSurface->GetHandle());
@@ -48,6 +48,7 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() const n
         requiredLayers.insert(requiredLayers.cend(), debugLayers.cbegin(), debugLayers.cend());
     }
 
+
     return requiredLayers;
 }
 
@@ -63,17 +64,26 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() con
 }
 
 void VulkanContext::TryPickPrimaryPhysicalDevice() {
-    auto suitablePhysicalDevice = std::ranges::find_if(mPhysicalDevices, [&](auto &physicalDevice) {
-        auto queueFamilyIndices = QueueFamilyIndices(physicalDevice.GetHandle(), mSurface->GetHandle());
-        queueFamilyIndices.TryInitialize();
-        return queueFamilyIndices.TryGetGraphicsQueueFamilyIndex() && queueFamilyIndices.TryGetPresentQueueFamilyIndex();
+    auto compatiblePhysicalDevice = std::ranges::find_if(mPhysicalDevices, [&](auto &physicalDevice) {
+        return IsDeviceCompatible(physicalDevice);
     });
 
-    if (suitablePhysicalDevice == mPhysicalDevices.end()) {
+    if (compatiblePhysicalDevice == mPhysicalDevices.end()) {
         throw std::runtime_error("Could not find any compatible GPU");
     }
 
-    mPrimaryPhysicalDevice.reset(&*suitablePhysicalDevice);
+    mPrimaryPhysicalDevice.reset(&*compatiblePhysicalDevice);
+
+    auto descriptor = mPrimaryPhysicalDevice->GetDescriptor();
+    std::cout << "Compatible GPU: " << descriptor.Name() << ", vendor id: " << std::hex << "0x" << descriptor.VendorID() << std::endl;
+}
+
+bool VulkanContext::IsDeviceCompatible(PhysicalDevice &physicalDevice) {
+    auto queueFamilyIndices = QueueFamilyIndices(physicalDevice.GetHandle(), mSurface->GetHandle());
+    queueFamilyIndices.TryInitialize();
+
+    return queueFamilyIndices.TryGetGraphicsQueueFamilyIndex() &&
+           queueFamilyIndices.TryGetPresentQueueFamilyIndex();
 }
 
 VulkanContext::~VulkanContext() noexcept {

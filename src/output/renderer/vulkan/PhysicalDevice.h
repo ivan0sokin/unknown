@@ -4,11 +4,13 @@
 #include <vector>
 
 #include "VulkanHandle.h"
+#include "PhysicalDeviceDescriptor.h"
 
 class PhysicalDevice : public VulkanHandle<VkPhysicalDevice> {
+    friend class Instance;
 public:
     PhysicalDevice() = delete;
-    static std::vector<PhysicalDevice> GetPhysicalDeviceList(VkInstance instance);
+    PhysicalDeviceDescriptor GetDescriptor() noexcept;
 private:
     constexpr PhysicalDevice(VkPhysicalDevice physicalDevice) noexcept { mHandle = physicalDevice; }
 };

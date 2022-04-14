@@ -28,6 +28,7 @@ private:
     std::vector<char const *> GetRequiredInstanceExtensionNames() const noexcept;
 
     void TryPickPrimaryPhysicalDevice();
+    bool IsDeviceCompatible(PhysicalDevice &physicalDevice);
 private:
     WindowProperties mWindowProperties;
 

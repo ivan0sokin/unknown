@@ -73,19 +73,21 @@ bool Instance::IsRequiredAPIVersionSupported() const {
 }
 
 bool Instance::AreEnabledLayersSupported() const noexcept {
-    return std::ranges::all_of(mEnabledLayerNames, [&](auto enabledLayerName) {
-        return std::ranges::find_if(std::as_const(mLayerProperties), [&](auto const &layerProperty) {
-            return std::string_view(layerProperty.layerName) == std::string_view(enabledLayerName);
-        }) != mLayerProperties.cend();
+    auto enabledLayerNames = std::unordered_set<std::string_view>(mEnabledLayerNames.cbegin(), mEnabledLayerNames.cend());
+    std::ranges::for_each(std::as_const(mLayerProperties), [&](auto const &layerProperty) {
+        enabledLayerNames.erase(std::string_view(layerProperty.layerName));
     });
+
+    return enabledLayerNames.empty();
 }
 
 bool Instance::AreEnabledExtensionsSupported() const noexcept {
-    return std::ranges::all_of(mEnabledExtensionNames, [&](auto enabledExtensionName) {
-        return std::ranges::find_if(std::as_const(mExtensionProperties), [&](auto const &extensionProperty) {
-            return std::string_view(extensionProperty.extensionName) == std::string_view(enabledExtensionName);
-        }) != mExtensionProperties.cend();
+    auto enabledExtensionNames = std::unordered_set<std::string_view>(mEnabledExtensionNames.cbegin(), mEnabledExtensionNames.cend());
+    std::ranges::for_each(std::as_const(mExtensionProperties), [&](auto const &extensionProperty) {
+        enabledExtensionNames.erase(std::string_view(extensionProperty.extensionName));
     });
+
+    return enabledExtensionNames.empty();
 }
 
 void Instance::Destroy() noexcept {
@@ -97,4 +99,26 @@ void Instance::Destroy() noexcept {
 
 Instance::~Instance() noexcept {
     Destroy();
+}
+
+std::vector<PhysicalDevice> Instance::GetPhysicalDeviceList() {
+    unsigned physicalDeviceCount;
+    VulkanResult result = vkEnumeratePhysicalDevices(mHandle, &physicalDeviceCount, nullptr);
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkPhysicalDevice count, result: " + result.ToString());
+    }
+
+    auto physicalDeviceHandles = std::vector<VkPhysicalDevice>(static_cast<std::size_t>(physicalDeviceCount));
+    result = vkEnumeratePhysicalDevices(mHandle, &physicalDeviceCount, physicalDeviceHandles.data());
+    if (!result.Success()) {
+        throw std::runtime_error("Failed to get VkPhysicalDevices, result: " + result.ToString());
+    }
+
+    std::vector<PhysicalDevice> physicalDevices;
+    physicalDevices.reserve(static_cast<std::size_t>(physicalDeviceCount));
+    std::ranges::for_each(std::as_const(physicalDeviceHandles), [&](VkPhysicalDevice physicalDeviceHandle) {
+        physicalDevices.push_back(physicalDeviceHandle);
+    });
+
+    return physicalDevices;
 }
