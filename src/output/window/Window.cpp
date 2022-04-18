@@ -67,5 +67,5 @@ void Window::SetSpecificWindowHints() noexcept {
 }
 
 WindowProperties Window::GetProperties() noexcept {
-    return WindowProperties { glfwGetWin32Window(mHandle) };
+    return WindowProperties { glfwGetWin32Window(mHandle), mWidth, mHeight };
 }

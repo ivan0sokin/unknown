@@ -18,9 +18,9 @@ void LogicalDevice::TryCreate() {
 }
 
 void LogicalDevice::Destroy() noexcept {
-    if (mHandle != nullptr) {
+    if (mHandle != VK_NULL_HANDLE) {
         vkDestroyDevice(mHandle, nullAllocator);
-        mHandle = nullptr;
+        mHandle = VK_NULL_HANDLE;
     }
 }
 

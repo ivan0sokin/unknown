@@ -14,7 +14,7 @@ void Surface::TryCreate() {
     }
 }
 
-char const * Surface::GetPlatformSpecificExtensionName() noexcept {
+std::string_view const Surface::GetPlatformSpecificExtensionName() noexcept {
     switch (OS) {
         case OperatingSystem::Windows:
             return windowsExtensionName;
@@ -27,14 +27,14 @@ char const * Surface::GetPlatformSpecificExtensionName() noexcept {
     }
 }
 
-char const * Surface::GetExtensionName() noexcept {
+std::string_view const Surface::GetExtensionName() noexcept {
     return extensionName;
 }
 
 void Surface::Destroy() noexcept {
-    if (mHandle != nullptr) {
+    if (mHandle != VK_NULL_HANDLE) {
         vkDestroySurfaceKHR(mInstance, mHandle, nullAllocator);
-        mHandle = nullptr;
+        mHandle = VK_NULL_HANDLE;
     }
 }
 

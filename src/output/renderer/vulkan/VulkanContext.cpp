@@ -12,7 +12,7 @@ void VulkanContext::Initialize() {
     auto requiredLayerNames = GetRequiredInstanceLayerNames();
     auto requiredExtensionNames = GetRequiredInstanceExtensionNames();
     mInstance = std::make_unique<Instance>(requiredLayerNames, requiredExtensionNames, applicationInfo.GetDescriptor());
-    mInstance->TryInitialize();
+    mInstance->TryCreate();
     mInstance->TryCreate();
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
@@ -31,14 +31,26 @@ void VulkanContext::Initialize() {
 
     auto queueFamilyIndices = QueueFamilyIndices(mPrimaryPhysicalDevice->GetHandle(), mSurface->GetHandle());
     queueFamilyIndices.TryInitialize();
+    unsigned graphicsQueueFamilyIndex = queueFamilyIndices.TryGetGraphicsQueueFamilyIndex().value();
+    unsigned presentQueueFamilyIndex = queueFamilyIndices.TryGetPresentQueueFamilyIndex().value();
 
-    std::vector<VkDeviceQueueCreateInfo> queueCreateInfoList = { QueueCreateInfo(queueFamilyIndices.TryGetGraphicsQueueFamilyIndex().value(), { HIGH_PRIORITY }).GetDescriptor() };
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfoList = { QueueCreateInfo(graphicsQueueFamilyIndex, { HIGH_PRIORITY }).GetDescriptor() };
     if (!queueFamilyIndices.AreGraphicsAndPresentFamilyIndicesSimilar()) {
-        queueCreateInfoList.push_back(QueueCreateInfo(queueFamilyIndices.TryGetPresentQueueFamilyIndex().value(), { HIGH_PRIORITY }).GetDescriptor());
+        queueCreateInfoList.push_back(QueueCreateInfo(presentQueueFamilyIndex, { HIGH_PRIORITY }).GetDescriptor());
     }
 
     mLogicalDevice = std::make_unique<LogicalDevice>(mPrimaryPhysicalDevice->GetHandle(), queueCreateInfoList);
     mLogicalDevice->TryCreate();
+
+    auto queueFamilyIndexList = std::array<unsigned, 2>{ graphicsQueueFamilyIndex, presentQueueFamilyIndex };
+    auto surfaceProperties = SurfaceProperties(mSurface->GetHandle(), mPrimaryPhysicalDevice->GetHandle(), mWindowProperties);
+    mSwapChain = std::make_unique<SwapChain>(
+        mLogicalDevice->GetHandle(),
+        mSurface->GetHandle(),
+        surfaceProperties,
+        queueFamilyIndexList
+    );
+    mSwapChain->TryCreate();
 }
 
 std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() const noexcept {
@@ -54,7 +66,7 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() const n
 
 std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() const noexcept {
     std::vector<char const *> requiredExtensions;
-    requiredExtensions.insert(requiredExtensions.cend(), { Surface::GetExtensionName(), Surface::GetPlatformSpecificExtensionName() });
+    requiredExtensions.insert(requiredExtensions.cend(), { Surface::GetExtensionName().data(), Surface::GetPlatformSpecificExtensionName().data() });
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
         requiredExtensions.insert(requiredExtensions.cend(), debugExtensions.cbegin(), debugExtensions.cend());
@@ -83,14 +95,14 @@ bool VulkanContext::IsDeviceCompatible(PhysicalDevice &physicalDevice) {
     queueFamilyIndices.TryInitialize();
 
     return queueFamilyIndices.TryGetGraphicsQueueFamilyIndex() &&
-           queueFamilyIndices.TryGetPresentQueueFamilyIndex();
+           queueFamilyIndices.TryGetPresentQueueFamilyIndex() &&
+           physicalDevice.SupportsExtensions({ SwapChain::GetRequiredDeviceExtensionName() });
 }
 
 VulkanContext::~VulkanContext() noexcept {
+    mSwapChain->Destroy();
     mLogicalDevice->Destroy();
-
     mPrimaryPhysicalDevice.release();
-
     mSurface->Destroy();
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {

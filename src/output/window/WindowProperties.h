@@ -5,6 +5,7 @@
 
 struct WindowProperties {
     HWND windowHandle;
+    int width, height;
 };
 
 #endif

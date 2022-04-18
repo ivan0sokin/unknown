@@ -28,7 +28,9 @@ set(SOURCES main.cpp
             output/renderer/vulkan/Surface.cpp
             output/renderer/vulkan/PhysicalDevice.cpp
             output/renderer/vulkan/QueueFamilyIndices.cpp
-            output/renderer/vulkan/LogicalDevice.cpp)
+            output/renderer/vulkan/LogicalDevice.cpp
+            output/renderer/vulkan/SurfaceProperties.cpp
+            output/renderer/vulkan/SwapChain.cpp)
 
 find_library(GLFW NAMES glfw3 PATHS ${GLFW_DIR}/*)
 find_library(VULKAN NAMES vulkan-1 PATHS ${VULKAN_DIR}/*)

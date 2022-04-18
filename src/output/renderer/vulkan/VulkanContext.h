@@ -15,6 +15,7 @@
 #include "QueueFamilyIndices.h"
 #include "QueueCreateInfo.h"
 #include "LogicalDevice.h"
+#include "SwapChain.h"
 
 class VulkanContext : public GraphicsContext {
 public:
@@ -38,6 +39,7 @@ private:
     std::vector<PhysicalDevice> mPhysicalDevices;
     std::unique_ptr<PhysicalDevice> mPrimaryPhysicalDevice;
     std::unique_ptr<LogicalDevice> mLogicalDevice;
+    std::unique_ptr<SwapChain> mSwapChain;
 
     constexpr static std::array<char const *, 1> debugLayers = { "VK_LAYER_KHRONOS_validation" };
     constexpr static std::array<char const *, 1> debugExtensions = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };

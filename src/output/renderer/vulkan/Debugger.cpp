@@ -32,9 +32,9 @@ VkBool32 Debugger::CallbackHandler(VkDebugUtilsMessageSeverityFlagBitsEXT messag
 }
 
 void Debugger::Destroy() noexcept {
-    if (mHandle != nullptr) {
+    if (mHandle != VK_NULL_HANDLE) {
         DestroyDebugUtilsMessengerEXT(mInstance, mHandle, nullAllocator);
-        mHandle = nullptr;
+        mHandle = VK_NULL_HANDLE;
     }
 }
 

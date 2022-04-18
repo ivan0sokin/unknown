@@ -90,17 +90,6 @@ bool Instance::AreEnabledExtensionsSupported() const noexcept {
     return enabledExtensionNames.empty();
 }
 
-void Instance::Destroy() noexcept {
-    if (mHandle != nullptr) {
-        vkDestroyInstance(mHandle, nullAllocator);
-        mHandle = nullptr;
-    }
-}
-
-Instance::~Instance() noexcept {
-    Destroy();
-}
-
 std::vector<PhysicalDevice> Instance::GetPhysicalDeviceList() {
     unsigned physicalDeviceCount;
     VulkanResult result = vkEnumeratePhysicalDevices(mHandle, &physicalDeviceCount, nullptr);
@@ -121,4 +110,15 @@ std::vector<PhysicalDevice> Instance::GetPhysicalDeviceList() {
     });
 
     return physicalDevices;
+}
+
+void Instance::Destroy() noexcept {
+    if (mHandle != VK_NULL_HANDLE) {
+        vkDestroyInstance(mHandle, nullAllocator);
+        mHandle = VK_NULL_HANDLE;
+    }
+}
+
+Instance::~Instance() noexcept {
+    Destroy();
 }
