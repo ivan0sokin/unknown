@@ -27,9 +27,11 @@ public:
 private:
     std::vector<char const *> GetRequiredInstanceLayerNames() const noexcept;
     std::vector<char const *> GetRequiredInstanceExtensionNames() const noexcept;
+    std::vector<char const *> GetRequiredLogicalDeviceExtensionNames() const noexcept;
 
     void TryPickPrimaryPhysicalDevice();
     bool IsDeviceCompatible(PhysicalDevice &physicalDevice);
+    void DescribePrimaryPhysicalDevice() const noexcept;
 private:
     WindowProperties mWindowProperties;
 

@@ -19,14 +19,13 @@ public:
     void TryCreate();
     void Destroy() noexcept;
 
-    constexpr static std::string_view GetRequiredDeviceExtensionName() noexcept { return requiredDeviceExtensionName; }
+    constexpr static std::string_view GetRequiredDeviceExtensionName() noexcept { return VK_KHR_SWAPCHAIN_EXTENSION_NAME; }
 private:
     VkDevice mLogicalDevice;
     VkSurfaceKHR mSurface;
     SurfaceProperties mSurfaceProperties;
     std::vector<unsigned> mQueueFamilyIndices;
 
-    constexpr static std::string_view requiredDeviceExtensionName = VK_KHR_SWAPCHAIN_EXTENSION_NAME;
     constexpr static VkFormat preferredFormat = VK_FORMAT_B8G8R8A8_SRGB;
     constexpr static VkColorSpaceKHR preferredColorSpace = VK_COLORSPACE_SRGB_NONLINEAR_KHR;
     constexpr static VkPresentModeKHR preferredPresentMode = VK_PRESENT_MODE_MAILBOX_KHR;

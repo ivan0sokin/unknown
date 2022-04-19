@@ -1,6 +1,6 @@
 #include "PhysicalDevice.h"
 
-PhysicalDeviceDescriptor PhysicalDevice::GetDescriptor() noexcept {
+PhysicalDeviceDescriptor PhysicalDevice::GetDescriptor() const noexcept {
     VkPhysicalDeviceProperties properties;
     vkGetPhysicalDeviceProperties(mHandle, &properties);
     return { properties };

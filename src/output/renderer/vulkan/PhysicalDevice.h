@@ -12,7 +12,7 @@ class PhysicalDevice : public VulkanHandle<VkPhysicalDevice> {
 public:
     PhysicalDevice() = delete;
 
-    PhysicalDeviceDescriptor GetDescriptor() noexcept;
+    PhysicalDeviceDescriptor GetDescriptor() const noexcept;
 
     bool SupportsExtensions(std::initializer_list<std::string_view> extensionNames);
 private:

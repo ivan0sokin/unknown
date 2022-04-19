@@ -28,6 +28,7 @@ void VulkanContext::Initialize() {
 
     mPhysicalDevices = mInstance->GetPhysicalDeviceList();
     TryPickPrimaryPhysicalDevice();
+    DescribePrimaryPhysicalDevice();
 
     auto queueFamilyIndices = QueueFamilyIndices(mPrimaryPhysicalDevice->GetHandle(), mSurface->GetHandle());
     queueFamilyIndices.TryInitialize();
@@ -39,7 +40,8 @@ void VulkanContext::Initialize() {
         queueCreateInfoList.push_back(QueueCreateInfo(presentQueueFamilyIndex, { HIGH_PRIORITY }).GetDescriptor());
     }
 
-    mLogicalDevice = std::make_unique<LogicalDevice>(mPrimaryPhysicalDevice->GetHandle(), queueCreateInfoList);
+    auto requiredLogicalDeviceExtensionNames = GetRequiredLogicalDeviceExtensionNames();
+    mLogicalDevice = std::make_unique<LogicalDevice>(mPrimaryPhysicalDevice->GetHandle(), queueCreateInfoList, requiredLogicalDeviceExtensionNames);
     mLogicalDevice->TryCreate();
 
     auto queueFamilyIndexList = std::array<unsigned, 2>{ graphicsQueueFamilyIndex, presentQueueFamilyIndex };
@@ -65,13 +67,17 @@ std::vector<char const *> VulkanContext::GetRequiredInstanceLayerNames() const n
 }
 
 std::vector<char const *> VulkanContext::GetRequiredInstanceExtensionNames() const noexcept {
-    std::vector<char const *> requiredExtensions;
-    requiredExtensions.insert(requiredExtensions.cend(), { Surface::GetExtensionName().data(), Surface::GetPlatformSpecificExtensionName().data() });
+    auto requiredExtensions = std::vector<char const *>{ Surface::GetExtensionName().data(), Surface::GetPlatformSpecificExtensionName().data() };
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
         requiredExtensions.insert(requiredExtensions.cend(), debugExtensions.cbegin(), debugExtensions.cend());
     }
 
+    return requiredExtensions;
+}
+
+std::vector<char const *> VulkanContext::GetRequiredLogicalDeviceExtensionNames() const noexcept {
+    auto requiredExtensions = std::vector<char const*>{ SwapChain::GetRequiredDeviceExtensionName().data() };
     return requiredExtensions;
 }
 
@@ -85,7 +91,9 @@ void VulkanContext::TryPickPrimaryPhysicalDevice() {
     }
 
     mPrimaryPhysicalDevice.reset(&*compatiblePhysicalDevice);
+}
 
+void VulkanContext::DescribePrimaryPhysicalDevice() const noexcept {
     auto descriptor = mPrimaryPhysicalDevice->GetDescriptor();
     std::cout << "Compatible GPU: " << descriptor.Name() << ", vendor id: " << std::hex << "0x" << descriptor.VendorID() << std::endl;
 }
@@ -102,7 +110,6 @@ bool VulkanContext::IsDeviceCompatible(PhysicalDevice &physicalDevice) {
 VulkanContext::~VulkanContext() noexcept {
     mSwapChain->Destroy();
     mLogicalDevice->Destroy();
-    mPrimaryPhysicalDevice.release();
     mSurface->Destroy();
 
     if (Core::Build::CONFIGURATION == Core::Build::Configuration::Debug) {
@@ -110,4 +117,6 @@ VulkanContext::~VulkanContext() noexcept {
     }
 
     mInstance->Destroy();
+
+    mPrimaryPhysicalDevice.release();
 }
